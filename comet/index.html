@@ -1,0 +1,74 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+    <title>Comet demo</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <script type="text/javascript" src="prototype.js"></script>
+  </head>
+  <body>
+
+<div id="content">
+</div>
+<a href="index2.html">link</a>
+<script type="text/javascript">
+var Comet = Class.create();
+
+Comet.prototype = {
+
+  timestamp: 0,
+  url: './toma_pedidos.php',
+  noerror: true,
+
+  initialize: function() { },
+
+  connect: function()
+  {
+    this.ajax = new Ajax.Request(this.url, {
+      method: 'get',
+      parameters: { 'time' : this.timestamp },
+      onSuccess: function(transport) {
+        // manejar la respuesta del servidor
+        var response = transport.responseText.evalJSON();
+        this.comet.timestamp = response[1];
+        this.comet.handleResponse(response);
+        this.comet.noerror = true;
+      },
+      onComplete: function(transport) {
+        // enviar una nueva solicitud de ajax cuando finalice esta solicitud
+        if (!this.comet.noerror)
+          // si se produce un problema de conexión , intente volver a conectar cada 5 segundos
+          setTimeout(function(){ comet.connect() }, 5000);
+        else
+          this.comet.connect();
+        this.comet.noerror = false;
+      }
+    });
+    this.ajax.comet = this;
+  },
+
+  disconnect: function()
+  {
+  },
+
+  handleResponse: function(response)//recibimos la respuesta en tiempo real
+  {
+    $('content').innerHTML += '<div> tiempo:' + response +'  pedidos: '+response[0]+'</div>';
+  },
+
+  doRequest: function(request)//enviar el nuevo mensaje
+  {
+    new Ajax.Request(this.url, {
+      method: 'get',
+      parameters: { 'time' : request }
+    });
+  }
+
+}
+var comet = new Comet();
+comet.connect();//instancia un objeto
+</script>
+
+
+
+
+
+</body></html>
