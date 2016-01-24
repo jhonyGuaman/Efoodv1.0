@@ -1,4 +1,4 @@
-  $(document).ready(function(){
+$(document).ready(function(){
     $("#cedula").focusout(function(){
       if($("#cedula").val()=="" || $("#cedula").val().length <10){
           new PNotify({title: 'Error',text: 'Campo cedula esta incompleto o vacio',type: 'error',delay: 2000});
@@ -19,7 +19,13 @@ $("#cedula").keypress(function(tecla) {
   }
 });
 
-
+/*
+    *@autor    Jhony Guaman & John Morrillo
+    *@date      27/Diciembte/2015
+    *@name      buscar_cedulaCliente 
+    * Método buscar_cedulaCliente permite buscar la cedula de los cliente 
+    * para comprobar la existencia de los cliente.
+*/
 function buscar_cedulaCliente(){
   var cedula=$("#cedula").val();
   //alert(cedula);
@@ -39,7 +45,12 @@ function buscar_cedulaCliente(){
   });
 }
 
-
+/*
+    *@autor    Jhony Guaman & John Morrillo
+    *@date      30/Diciembre/2015
+    *@name      registrar_cliente 
+    * Método registrar cliente que permite registrar al cliente  
+*/
 $(document).ready(function(){
   $("#gcliente").click(function(){
     var cedula=$('#cedula').val();
@@ -89,6 +100,12 @@ $(document).ready(function(){
 
 
     ///FUNCIONES PARA ACTULIZAR MOSTRAR Y ELIMINAR CLIENTES
+/*
+    *@autor    Jhony Guaman & John Morrillo
+    *@date      30/Diciembte/2015
+    *@name     cargar_clientes 
+    * Método cargar_clientes mostrar todos los clientes registrados.
+*/
 
     function cargar_clientes(){
       $('#lista_clientes').html("<img style='margin-left: 10cm' src='dist/img/cargando_clientes.gif'> ");
@@ -102,6 +119,15 @@ $(document).ready(function(){
         }
       });
     }
+
+/*
+    *@autor    Jhony Guaman & John Morrillo
+    *@date      30/Diciembte/2015
+    *@name     lista_cliente 
+    * Método lista_cliente  mostrar todos los clientes registrados.
+    @param     valor 
+*/
+
     function lista_cliente(valor){
 
       $('#lista_clientes').html("<img style='margin-left: 10cm' src='dist/img/cargando_clientes.gif'> ");
@@ -124,7 +150,14 @@ $(document).ready(function(){
         });
       }
     }
-
+/*
+    *@autor    Jhony Guaman & John Morrillo
+    *@date      30/Diciembte/2015
+    *@name     actualizar_clientes 
+    * Método actualizar_clientes permite buscar el cliente en la base de datos
+    * y cargando los datos obtenidos en el formularios de actualizacion 
+    @param     id 
+*/
     function actualizar_clientes(id){
       //divResultado = document.getElementById('lista1');
       $.ajax({
@@ -145,7 +178,13 @@ $(document).ready(function(){
         }
       });
     }
-
+/*
+    *@autor    Jhony Guaman & John Morrillo
+    *@date      30/Diciembte/2015
+    *@name     update_cliente 
+    * Método update_cliente permite obtener los datos del formulario
+    * para asi realizar el respectivo update 
+*/
 
     function update_cliente(){
       //var $id2=$('#id_update').val();
@@ -161,7 +200,13 @@ $(document).ready(function(){
         }
       });
     }
-
+/*
+    *@autor    Jhony Guaman & John Morrillo
+    *@date      30/Diciembte/2015
+    *@name     eliminar_cliente
+    * Método eliminar_cliente permite eliminar el cliente
+    *@param     id 
+*/
     function eliminar_cliente(id){
       divResultado = document.getElementById('lista_clientes');
       var opcionEliminar= confirm("Esta seguro Eliminar el Cliente");
