@@ -1,3 +1,5 @@
+<script src="Controlador/control_mesas.js"></script>
+
 <div class="container-fluid">
   <div class="row">
     <div class="col-lg-12">
