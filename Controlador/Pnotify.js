@@ -26,7 +26,7 @@ PNotify.desktop.permission();
 }
 })).get().click(function(e) {
 if ($('.ui-pnotify-closer, .ui-pnotify-sticker, .ui-pnotify-closer *, .ui-pnotify-sticker *').is(e.target)) return;
-//alert('Hey! You clicked the desktop notification!');
+cambiarcont('movimiento_mesa.php');
 });
 
 }
@@ -104,4 +104,20 @@ function show_stack_custom2(type) {
         break;
     }
     new PNotify(opts);
+}
+
+
+
+function sms_error(sms){
+new PNotify({
+    title: 'Error ',
+    type: 'error',
+    text: 'I use effects from Animate.css. Such smooth CSS3 transitions make me feel like butter.',
+    animate: {
+        animate: true,
+        in_class: 'zoomInLeft',
+        out_class: 'zoomOutRight'
+    }
+});
+
 }

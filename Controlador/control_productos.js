@@ -1,5 +1,22 @@
+$(document).ready(function(){
+$("#idtipo").val("8");
 
-//funcion para ingresar productos nuevo
+});
+
+// stock minimo
+
+/*$("#stockmin").blur(function(){
+      comprobar();
+});
+
+
+function comprobar(){
+  var cantidad=$("#cantidad").val();
+  var stockmin=$("#stockmin").val();
+ 
+
+}*/
+//funcion para ingresar PRODUCTOS INDUSTRIALIZADOS
 $(document).ready(function(){
   $("#btn_producto2").click(function(){
      if ($("#nombreP").val()== "") {
@@ -9,8 +26,10 @@ $(document).ready(function(){
       new PNotify({title: 'Error',text: 'El campo Precio esta vacio',type: 'error',delay: 2000});
       $("#precio").focus();
     }else if ($("#cantidad").val()=="") {
-      new PNotify({title: 'Error',text: 'El campo Precio esta vacio',type: 'error',delay: 2000});
+      new PNotify({title: 'Error',text: 'El campo Cantidad esta vacio',type: 'error',delay: 2000});
       $("#cantidad").focus();
+    }else if($("#cantidad").val()<=$("stockmin").val()){
+      new PNotify({title: 'Error',text: 'La Cantidad es menor al stock minimo ',type: 'error',delay: 2000});
     }
     else{
       var nombreP=$("#nombreP").val();
@@ -19,18 +38,16 @@ $(document).ready(function(){
       var cantidad=$("#cantidad").val();
       var iva=$("input:radio[name=iva]:checked").val();
       var precio_iva=$("#precio_iva").val();
-      var dias=$("#dias").val();
-      //alert(iva);
-      //var iva12=$("#precio_iva").val();
+      var stockmin=$("#stockmin").val();
       $.ajax({
         type:"POST",
         dataType:"json",
         url:'productos/insertaProd.php',
-        data:{nombreP:nombreP,precio:precio,cantidad:cantidad,categoria:categoria,iva:iva,precio_iva:precio_iva,dias:dias},
+        data:{nombreP:nombreP,precio:precio,cantidad:cantidad,categoria:categoria,iva:iva,precio_iva:precio_iva,stockmin:stockmin},
         success:function(response){
           if(response.respuesta==true){
             $('#mensaje').fadeIn(3000);
-            alert("Producto Registrado Correctamente");
+            swal({   title: "Registro Correcto!",   text: "El producto se registro correctamente",   timer: 2000,   showConfirmButton: false });
             $("#nombreP").val("");
             $("#precio").val("");
             $('#cantidad').val("");
@@ -56,51 +73,6 @@ $(document).ready(function(){
   }
   });
 });
-
-//FUNCIONES PARA INGRESAR PRODUCTOS INDUSTRIALIZADOS
-$(document).ready(function(){
-  $("#btn_producto").click(function(){
-     if ($("#nombreP").val()== "") {
-      new PNotify({title: 'Error',text: 'El campo nombre del Producto esta vacio',type: 'error',delay: 2000});
-      $("#nombreP").focus();
-    }else if ($("#precio").val()=="") {
-      new PNotify({title: 'Error',text: 'El campo Precio esta vacio',type: 'error',delay: 2000});
-      $("#precio").focus();
-    }else if ($("#cantidad").val()=="") {
-      new PNotify({title: 'Error',text: 'El campo Precio esta vacio',type: 'error',delay: 2000});
-      $("#cantidad").focus();
-    }
-    else{
-      var nombreP=$("#nombreP").val();
-      var precio=$("#precio").val();
-      var cantidad=$("#cantidad").val();
-      var categoria=$("#idtipo").val();
-      var dias=$("#dias").val();
-      //alert(iva);
-      //var iva12=$("#precio_iva").val();
-      $.ajax({
-        type:"POST",
-        dataType:"json",
-        url:'bebidas/insertar_bebidas.php',
-        data:{nombreP:nombreP,precio:precio,cantidad:cantidad,idtipo:categoria,dias:dias},
-        success:function(response){
-          if(response.respuesta==true){
-            $('#mensaje').fadeIn(3000);
-            new PNotify({title: 'Ingreso de Bebida',text: 'Bebida registrada correctamente',type: 'success',delay: 2000});
-            
-            $("#nombreP").val("");
-            $("#precio").val("");
-            $('#cantidad').val("");
-            
-          }else
-          {
-            $("#mensaje").html(response.mensaje)
-          }
-        }
-
-      });
-    }});
-  });
 
 
 function validar_existencia_producto(){
@@ -156,16 +128,15 @@ function actualizar_producto(id){
       $('#precio').val(response.Pprecio);
       $('#cantidad').val(response.Pcantidad);
       $('#precio_iva').val(response.Pprecioiva);
+      $('#stockmin').val(response.stockmin);
 
-      if(response.Piva=='12%'){
-        alert("producto con iva 12 %");
+      if(response.Piva=='Si'){
         $('#iva12').prop("checked", true);
       }else {
-        alert("producto con iva 0 %");
         $('#iva0').prop("checked", true);
       }
       $('#idtipo').val(response.Pcategoria);
-      $('#dias').val(response.Pdias);
+      
 
 
     }
@@ -177,28 +148,37 @@ function update_producto(){
   var nombre=$('#nombre_producto').val();
   var precio=  $('#precio').val();
   var cantidad=$('#cantidad').val();
-  var dias=$('#dias').val();
   var idtipo=$('#idtipo').val();
   var precio_iva=$('#precio_iva').val();
+  var stockmin=$('#stockmin').val();
 
   var iva=$('input:radio[name=iva]:checked').val();
-  alert("iva "+iva);
     $.ajax({
     url:'productos/adminProductos/update_productos.php',
     type:'POST',
-    data:{id:id,nombre:nombre,precio:precio,cantidad:cantidad,iva:iva,dias:dias,idtipo:idtipo,precio_iva:precio_iva},
+    data:{id:id,nombre:nombre,precio:precio,cantidad:cantidad,iva:iva,idtipo:idtipo,precio_iva:precio_iva,stockmin:stockmin},
     success:function(response){
-      $('#exito').show();
-      $('#lista_productos').html(response);
+       swal({   title: "Actualización Correcta!",   text: "El producto se ha actualizado de manera correcta.",   timer: 2000,   showConfirmButton: false });           
+       $('#lista_productos').html(response);
     }
   });
 }
 
 function eliminar_producto(id){
-  divResultado = document.getElementById('lista_productos');
-  var opcionEliminar= confirm("Esta seguro Eliminar el producto");
-  if (opcionEliminar)
-  {
+  swal({   title: "¿Estás seguro?", 
+   text: "De eliminar el producto seleccionado!",  
+   type: "warning", 
+   showCancelButton: true,  
+   confirmButtonColor: "#DD6B55", 
+   confirmButtonText: "Si, Eliminar!",   
+   cancelButtonText: "No, Cancelar!",   
+   closeOnConfirm: false,  
+    closeOnCancel: true 
+},
+
+ function(isConfirm){ 
+   if (isConfirm) {     
+    swal("Producto eliminado!", "Eliminación correcta.", "success");   
     $.ajax({
       url:'productos/adminProductos/delete_productos.php',
       type:'POST',
@@ -209,20 +189,21 @@ function eliminar_producto(id){
         //divResultado.innerHTML = ajax.responseText
       }
     });
+   } 
+       });
   }
-}
   //FUNCIION DEL IVA 12 %
   $(document).ready(function(){
     $("#iva12").click(function(){
       if($("#precio").val()==""){
-        new PNotify({title: 'Error',text: 'Ingrese el precio del producto',type: 'error',delay: 2000});
+        new PNotify({title: 'Error datos faltantes',text: 'Por Favor! ingrese primero el precio del producto',type: 'error',delay: 2000});
         $("#iva12").prop("checked", false)
         $("#precio").focus();
 
       } else {
         var precio= $("#precio").val();
         var precio_total=precio -(precio * 0.12);
-        alert(precio_total);
+        //alert(precio_total);
         $("#precio_iva").val(precio_total);}
       });
     });
@@ -231,13 +212,13 @@ function eliminar_producto(id){
     $(document).ready(function(){
       $("#iva0").click(function(){
         if($("#precio").val()==""){
-          new PNotify({title: 'Error',text: 'Ingrese el precio del producto',type: 'error',delay: 2000});
+          new PNotify({title: 'Error datos faltantes',text: 'Por Favor! ingrese primero el precio del producto',type: 'error',delay: 2000});
           $("#iva0").prop("checked", false)
           $("#precio").focus();
         }
         else{
           var precio= $("#precio").val();
-          alert(precio);
+         // alert(precio);
           $("#precio_iva").val(precio);
         }
       });

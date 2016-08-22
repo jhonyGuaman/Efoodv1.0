@@ -3,9 +3,12 @@ var link="'movimiento_mesa.php'";
 var num_mesa=[];
 var socket = io.connect('http://localhost:2015');
 var id='1';
-socket.emit("recibirDatos2", id);
-socket.on('notification2', function (data) {
-  $.each(data.cata2,function(index,user){
+socket.on('notification2', function (datas) {
+  $.each(datas.cata2,function(index,user){
+    if(user.cantidad<=8)
+        {
+          con2++;
+        }
     // if(user.estado==1){
     //   con2++;
     //   cl = 'class="bg-visto-pedido"';
@@ -22,40 +25,41 @@ socket.on('notification2', function (data) {
     //    $("#total"+user.numero_mesa).html("0,00");
     //
     // }
-    alert(" numero de presas "+user.presa1);
   });
   // lis2 ='<li class="header">Tiene '+con2+' pedidos nuevos</li><li><ul class="menu">';
   // lis2 +=lis;
   // lis2 += '</ul></li><li class="footer"><a href="javascript:cambiarcont('+link+')">ver todos los pedidos</a></li>';
-  // if (con_a !=con ) {
+   if (con_a !=con ) {
   //     $("#li_pedidos").html("");
   //     $("#li_pedidos").html(lis2);
-  //     if (con2 != 0) {
+       if (con2 != 0) {
   //       var n = id_p;
   //       //console.log("n vale "+ n);
   //       //console.log("id_p vale "+ id_p);
   //       console.log(con2);
   //       //if (id_p > n) {
-  //         if (con2_a < con2){
-  //           con3 = con2 - con2_a;
-  //           console.log("con3 vale "+ con3);
+           if (con2_a < con2){
+             con3 = con2 - con2_a;
+             console.log("con3 vale "+ con3);
   //
-  //           if(con3 > 1){
+             if(con3 > 1){
+              alert(" numero de presas "+con2);
+
   //             $("#audio")[0].play();
   //             notificarPedido("Notificacion Efood Nuevo Pedido","tiene "+con3+" pedidos nuevos");
   //
   //             //prueba_notificacion("Nuevos pedidos","tiene "+con3+" pedidos nuevos");
-  //           }else{
+            }else{
   //             $("#audio")[0].play();
   //             notificarPedido("Nuevo pedido","tiene "+con3+" pedido nuevo");
-  //           }
-  //         }
+             }
+           }
   //       //}
   //       $("#numpedi").addClass("label label-primary")
   //       $("#numpedi").html(con2);
   //       $("#numpedi2").addClass("label label-primary")
   //       $("#numpedi2").html(con2);
-  //     }
-  //}
+       }
+  }
   cl='';lis='';con_a = con;con2_a =con2;con = 0;con2=0;con3=0;
 });

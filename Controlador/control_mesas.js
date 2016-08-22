@@ -5,7 +5,9 @@ $("#btn_mesa").click(function(){
     new PNotify({title: 'Error',text: 'El numero de mesa se encuentra vacio',type: 'error',delay: 2000});
     $("#mesa").focus();
   }else{
-  guardar_mesa();
+    buscar_mesa();
+
+ 
       }
     });
 });
@@ -15,7 +17,7 @@ $("#mesa").keypress(function(tecla) {
       new PNotify({title: 'Error',text: 'El numero de mesa se encuentra vacio',type: 'error',delay: 2000});
       $("#mesa").focus();
     }else{
-    guardar_mesa();
+   buscar_mesa();
         }
   }
 });
@@ -41,6 +43,28 @@ $.ajax({
 
 }
 
+function buscar_mesa(){
+  var mesa=$('#mesa').val();
+  $.ajax({
+    url: 'mesas/buscar_mesas.php',
+    type: 'POST',
+    dataType: 'json',
+    data: {mesa:mesa},
+    success:function(response){
+      if(response.respuesta==true){
+        new PNotify({title: 'Error',text: response.mensaje ,type: 'error',delay: 2000});
+        $("#mesa").focus();
+      }else{
+        guardar_mesa();
+      }
+    }
+  });
+  
+  
+}
+
+
+
 
 function actualizar_mesa(id){
   //divResultado = document.getElementById('lista1');
@@ -65,8 +89,8 @@ function update_mesas(){
     type:'POST',
     data:datosform,
     success:function(response){
-      $('#exito').show();
-      $('#listaMesas').html(response);
+         swal({   title: "Actualización Correcta!",   text: "la mesa se ha actualizado de manera correcta.",   timer: 2000,   showConfirmButton: false });           
+         $('#listaMesas').html(response);
     }
   });
 }

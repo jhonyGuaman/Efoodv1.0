@@ -11,7 +11,7 @@ $(document).ready(function(){
 
 $("#cedula").keypress(function(tecla) {
   if(tecla.which == 13){
-    if($("#cedula").val()==""){
+    if($("#cedula").val()=="" || $("#cedula").val().length <10){
       new PNotify({title: 'Error',text: 'Campo cedula esta incompleto o vacio',type: 'error',delay: 2000});
     }else{
       buscar_cedulaCliente();
@@ -180,7 +180,7 @@ $(document).ready(function(){
     }
 /*
     *@autor    Jhony Guaman & John Morrillo
-    *@date      30/Diciembte/2015
+    *@date      30/Diciembre/2015
     *@name     update_cliente 
     * Método update_cliente permite obtener los datos del formulario
     * para asi realizar el respectivo update 
@@ -195,11 +195,11 @@ $(document).ready(function(){
         type:'POST',
         data:datosform,
         success:function(response){
-          $('#exito').show();
-          $('#lista_clientes').html(response);
+         swal({   title: "Actualización Correcta!",   text: "El cliente se ha actualizado de manera correcta.",   timer: 2000,   showConfirmButton: false });           
+         $('#lista_clientes').html(response);
         }
       });
-    }
+    } 
 /*
     *@autor    Jhony Guaman & John Morrillo
     *@date      30/Diciembte/2015
@@ -208,11 +208,19 @@ $(document).ready(function(){
     *@param     id 
 */
     function eliminar_cliente(id){
-      divResultado = document.getElementById('lista_clientes');
-      var opcionEliminar= confirm("Esta seguro Eliminar el Cliente");
-      if (opcionEliminar)
-      {
-        $.ajax({
+   swal({   title: "¿Estás seguro?", 
+   text: "De eliminar al Cliente seleccionado!",  
+   type: "warning", 
+   showCancelButton: true,  
+   confirmButtonColor: "#DD6B55", 
+   confirmButtonText: "Si, Eliminar!",   
+   cancelButtonText: "No, Cancelar!",   
+   closeOnConfirm: false,  
+    closeOnCancel: false 
+},
+ function(isConfirm){ 
+   if (isConfirm) {     
+    $.ajax({
           url:'clientes/delete_clientes.php',
           type:'POST',
           data:{id:id},
@@ -222,5 +230,12 @@ $(document).ready(function(){
             //divResultado.innerHTML = ajax.responseText
           }
         });
+    swal("Deleted!", "Your imaginary file has been deleted.", "success");   
+   } else {    
+    swal("Cancelled", "Your imaginary file is safe :)", "error"); 
       }
-    }
+       });
+
+}
+    
+ 
