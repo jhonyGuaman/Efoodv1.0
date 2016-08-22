@@ -1,151 +1,189 @@
 <?php
 include_once('conexion/db.php');
 ?>
-
-<!-- Select2 -->
 <link rel="stylesheet" href="plugins/select2/select2.min.css">
-<script src="plugins/jQuery/jQuery-2.1.4.min.js"></script>
+<link rel="stylesheet" href="dist/css/Efood.css">
 <script src="ventas/control_ventas.js"></script>
+<script src="Controlador/control_pedidos.js"></script>
+<script src="Controlador/control_cliente.js"></script>
 <script src="plugins/funciones/jsfunciones.js"></script>
 <script src="plugins/select2/select2.full.min.js"></script>
 
-<style>
-
-.precio input{
-  text-align: center;
-  border: 0;
-  width: 40px;
-}
-
-.fila input{
-text-align: center;
-width: 50px;
-}
-.fila_total input{
-border: 0;
-text-align: center;
-width: 40px;
-}
-.filas input{
-border: 0;
-text-align: center;
-}
-.aceptado_Cliente{
-margin-top: 5px;
-color: blue;
-}
-.negar_cliente{
-margin-top: 5px;
-color: red;
-
-}
-.margen{
-margin-top: 25px;
-}
-
-.margen select{
-border-radius: 10px;
-}
-.btn_add {
-margin-top: 25px;
-}
-.nfactura input{
-text-align: center;
-border: 0;
-}
-.alinear_der{
-margin-left: 30px;
-
-}
-.alinear_dere input{
-width: auto;
-background: #f39c12;
-text-decoration-color: #111;
-text-align: right;
-border: 0;
-}
-.alinear_der input{
-text-align: right;
-border: 0;
-}
-.ValorP{
-margin-top: 10px;
-border-radius: 7px;
-background: #f39c12;
-padding: 1em;
-font-family: sans-serif;
- box-shadow:  0px 5px 5px rgba(0, 0, 0, 0.5);
-
-}
-.Panel_producto{
-border-radius: 1em;
-padding: 1em;
-}
-.total{
-background-color: #333;
-padding: 1em;
-border-radius: 10px;
-text-align: center;
-margin: 1em auto;
-margin-bottom: 15px;
-margin-top: 15px;
-}
-
-.total input{
-font-size: 34px;
-font-family: "Square721 BT";
-background: #333;
-border: 0;
-width: 60%;
-color: #00d347;
-padding: 0.5em;
-margin-top: 10px;
-text-align: center;
-}
-.boton_limpirar{
-align-content:center;
-}
-.color_rojo{
-color: red;
-}
-
-.centrar_input{
-margin-left: 70px;
-}
-th{
-color:blue;
-}
-</style>
-
 <script type="text/javascript">
-$(document).ready(function(){
-var idpedido=$("#idpedio_txt").val();
-$(".box-title").html("Registro de Pedido N: "+idpedido);
-
-  $.ajax({
-    type:"POST",
-    url:"Modelo/buscar_pedido.php",
-    dataType:"json",
-    data:{idpedido:idpedido},
-      success:function(response){
-
-    }
+  $(document).ready(function(){
+    var idpedido = $("#idpedio_txt").val();
+      $("#cedula_buscar").focus();
+      $(".box-title").html("Registro de Pedido N: "+idpedido);
+        Fpedido();        /*funcion para buscar en la tabla pedido*/
+        detallepedido();  /*funcion para buscar en la tabla detallepedido*/
+        //BnumVenta();      /*funcion para generar el numero de venta*/
+        btnCancelar();    /*funcion para preguntar si se desea cancelar la accion actual*/
   });
+
+ function buscariva2(){
+  nfila=$("#tabla_detalle  tbody").find("tr").length;
+   idpedido = $("#idpedio_txt").val();
+   total=0;
+   totaliva=0;
+  for(var i=1 ; i<=nfila; i++){   
+     idplato=$("#codigo"+i+"").val();
+     //alert("id plato:"+idplato);
+    $.ajax({
+        type:"POST",
+        dataType:"json",
+        url:'ventas/buscariva.php',
+        data:{idplato:idplato,idpedido:idpedido},
+        success:function(response){
+          if(response.respuesta=='Si'){
+              totaliva=totaliva+(parseFloat(response.iva)+(parseFloat(response.iva)*parseFloat(response.valor)));
+              $("#iva12").val(totaliva);
+              $("#P_iva").html(response.impuesto);
+              $("#ruc1").val(response.ruc2);
+              if(parseInt(response.numeroFa2)<10){
+              $("#numFac1").val("00000000"+response.numeroFa2);
+              }else if(parseInt(response.numeroFa2)<100){
+              $("#numFac1").val("0000000"+response.numeroFa2);
+              }else if(parseInt(response.numeroFa2)<1000){
+              $("#numFac1").val("000000"+response.numeroFa2);
+              }else if(parseInt(response.numeroFa2)<10000){
+              $("#numFac1").val("00000"+response.numeroFa2);
+              }
+          }else{
+              total=total+parseFloat(response.iva)
+              $("#iva0").val(total);
+              $("#ruc2").val(response.ruc1);
+              if(parseInt(response.numeroFa1)<10){
+              $("#numFac2").val("00000000"+response.numeroFa1);
+              }else if(parseInt(response.numeroFa1)<100){
+              $("#numFac2").val("0000000"+response.numeroFa1);
+              }else if(parseInt(response.numeroFa1)<1000){
+              $("#numFac2").val("000000"+response.numeroFa1);
+              }else if(parseInt(response.numeroFa1)<10000){
+              $("#numFac2").val("00000"+response.numeroFa1);
+              }
+
+          $("#total_p").val(total+totaliva);
+
+          }
+          $("#totalp").val(total+totaliva);
+          $("#total_p").val(total+totaliva);
+        }
+      });
+     //alert("los otros productos son platos");
+  } // fin del for
+}//fin de la funcion buscar
+
+
+
+  function btnCancelar(){
+    $("#btn_cancelar").click(function(){
+      swal({   title: "¿Estás seguro?", 
+        text: "De regresar!",  
+        type: "warning", 
+        showCancelButton: true,  
+        confirmButtonColor: "#DD6B55", 
+        confirmButtonText: "Si, Regresar!",  
+        cancelButtonText: "No",   
+        closeOnConfirm: false,  
+        closeOnCancel: true 
+      },
+        function(isConfirm){ 
+          if (isConfirm) {     
+            swal("Se a cancelado!", "Sera redireccionado al inicio", "success");   
+            cambiarcont('movimiento_mesa.php');
+          }    
+        });
+    });
+  }
+
+/*
+* @autor    Jhony Guaman & John Morrillo
+* @date      1/Febrero/2016
+* @name      BmunVenta() 
+* La funcion BmunVenta permite buscar el numero de factura anterior 
+* y crea un el siguiente numeracion para la factura 
+*/
+  function BnumVenta(){
+    $.ajax({
+      url:'ventas/buscar_numVenta.php',
+      type:'POST',
+      dataType:'json',
+        success:function(response){
+          if(response.mensaje==null){ $("#nfactura").val("0000001"); }else{
+              var nfac=parseInt(response.mensaje)+1;      
+                  if(parseInt(response.mensaje)<10){
+                      $("#nfactura").val("000000"+nfac);  
+                          }else if(parseInt(response.mensaje)>=10){
+                                  $("#nfactura").val("00000"+nfac);  
+                                }      
+          }    
+        }   
+    });
+  }
+/*
+* @autor    Jhony Guaman & John Morrillo
+* @date      3/Enero/2016
+* @name      Fpedido()
+* La funcion Fpedido permite buscar el pedido mediante el id
+*/
+function Fpedido(){
+var id=$("#idpedio_txt").val();
+$.ajax({
+    url:'Modelo/buscar_pedido.php',
+    type:'POST',
+    dataType:'json',
+    data:{id:id},
+      success:function(response){
+        if(response.respuesta==true){
+          $("#total_p").val(response.total);
+          $("#subtotal").val(response.subtotal);
+          $('#totalp').val(response.total);
+        }else
+            {
+              new PNotify({title: 'Alerta',text: 'No se encuentran pedidos disponibles para esta mesa',type: 'error',delay: 2000});
+              cambiarcont('movimiento_mesa.php');
+              
+            }
+      }
 });
+}
+/*
+* @autor    Jhony Guaman & John Morrillo
+* @date      3/Enero/2016
+* @name      detallepedido 
+* La funcion detallepedido permite bucar el detalle del pedido 
+*/
+function detallepedido(){
+  var id =$("#idpedio_txt").val();
+  $.ajax({
+      url:'Modelo/buscar_detalleP.php',
+      type:'POST',
+      data:{id:id},
+      success:function(response){
+      $("#tproductos").html(response)   
+      buscariva2(); 
+      }     
+  });
+}
+
+
 </script>
+
 <div class="container-fluid"> <!-- Page Heading -->
 <div class="row">
   <div class="col-lg-12">
     <h1 class="page-header">
       Facturación
       <div class="pull-right box-tools">
-        <button class="btn btn-danger  btn-sm" id="btn_generar" ><i class="fa fa-share-square-o "></i> Generar Pedido</button>
+        <button class="btn btn-primary  btn-sm" id="btn_generar" onclick="guardarVenta()"><i class="fa fa-print"></i> Generar Venta</button>
+        <button class="btn btn-danger  btn-sm" id="btn_cancelar" ><i class="ion-ios-undo-outline"></i> Retornar</button>
+        <button class="btn btn-danger  btn-sm" id="btn_eliminar" ><i class="fa fa-trash-o"></i> Eliminar Pedido</button>
       </div><!-- /. tools -->
     </h1>
   </div>
 </div><!-- /.row -->
 <div class="col-md-12">
-  <div class="box box-primary">
+  <div class="box box-danger">
     <div class="box-header with-border">
       <h3 class="box-title">Registro de Pedidos - 
 </h3>
@@ -159,7 +197,7 @@ $(".box-title").html("Registro de Pedido N: "+idpedido);
               <div class="input-group-addon">
                 <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
               </div>
-              <input type="text" class="form-control"  id="cedula_buscar" placeholder="Ingrese el numero de Cedula" >
+              <input type="text" class="form-control"  id="cedula_buscar" placeholder="Ingrese el numero de Cedula" size="10" maxlength="10"> 
               <div class="input-group-btn">
                 <button type="button" class="btn btn-danger"> <i class="fa fa-search"></i></button>
                 <button type="button" class="btn btn-danger" data-toggle='modal' data-target='#modalR_Clientes'> <i class="fa fa-user-plus"></i></button>
@@ -175,7 +213,7 @@ $(".box-title").html("Registro de Pedido N: "+idpedido);
 
     <div class="panel panel-default">
       <div class="panel-body">
-        <div>
+        <div id="tproductos">
           <table class="table table-bordered table-hover" id="tabla_detalle">
             <thead>
               <tr>
@@ -184,7 +222,6 @@ $(".box-title").html("Registro de Pedido N: "+idpedido);
                 <th>Descripción</th>
                 <th>Precio unit.</th>
                 <th>Total</th>
-                <th>     </th>
               </tr>
             </thead>
             <tbody>
@@ -197,7 +234,7 @@ $(".box-title").html("Registro de Pedido N: "+idpedido);
       <div class="col-md-4 ">
       </div>
       <div class="col-md-4 boton_limpirar">
-        <button class="btn btn-info btn-sm" id="btn_limpirar" ><span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Limpiar Pedido</button>
+<!--       <button class="btn btn-info btn-sm" id="btn_limpirar" ><span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Limpiar Pedido</button> -->
       </div>
       <div class="col-md-4 filas">
         Numeros de Productos:<input type="text" name="nfilas" id="span_cantidad"> </input>
@@ -211,9 +248,14 @@ $(".box-title").html("Registro de Pedido N: "+idpedido);
     <div class="panel panel-default">
       <div class="panel-body">
         <div id="nFactura" class="text-center">
-          <label for="numero">Numero de Factura: </label>
-          <div class="input-group nfactura">
+          <label for="numero">Numero de Venta: </label>
+          <div class="input-group nfactura" style="margin-left: auto;margin-right: auto;">
             <input type="text" class="form-control centrar_input"  id="nfactura" placeholder="0000001" disabled="false">
+            <input type="text" name="numFac1" id="numFac1">
+            <input type="text" name="numFac2" id="numFac2">
+            <input type="text" id="ruc1">
+            <input type="text" id="ruc2">
+
           </div>
         </div>
       </div>
@@ -223,26 +265,26 @@ $(".box-title").html("Registro de Pedido N: "+idpedido);
       <div class="panel-body">
         <div id="subTotal">
               <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                       Sub-Total:
                     </div>
-                    <div class="col-md-8 alinear_der">
+                    <div class="col-md-6 alinear_der">
                   <input type="text" class="form-control"  id="subtotal" placeholder="$ 0,00" >
                     </div>
               </div>
               <div class="row">
-                    <div class="col-md-3">
-                      Iva 12%:
+                    <div class="col-md-4">
+                      <p id="P_iva">Iva 12%:</p>
                     </div>
-                    <div class="col-md-8 alinear_der">
+                    <div class="col-md-6 alinear_der">
                   <input type="text" class="form-control"  id="iva12" placeholder="$ 0,00" >
                     </div>
               </div>
               <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                       Iva 0%:
                     </div>
-                    <div class="col-md-8 alinear_der">
+                    <div class="col-md-6 alinear_der">
                   <input type="text" class="form-control"  id="iva0" placeholder="$ 0,00" >
                     </div>
               </div>
@@ -342,9 +384,7 @@ $(".box-title").html("Registro de Pedido N: "+idpedido);
           </div>
         </div>
         </div>
-
         <div class="form-group">
-
           <label class="control-label col-xs-5">Telefono:</label>
           <div class="col-xs-5">
           <div class="input-group">
@@ -366,9 +406,4 @@ $(".box-title").html("Registro de Pedido N: "+idpedido);
 </div><!-- /.modal -->
 <!--FIN DEL FORMULARIO PARA MODIFICAR PLATOS-->
 
-<script>
-$(function () {
-  //Initialize Select2 Elements
-  $(".select2").select2();
-});
-</script>
+
